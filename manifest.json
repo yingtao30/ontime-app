@@ -1,0 +1,17 @@
+{
+  "name": "OnTime — 약속을 지키는 습관",
+  "short_name": "OnTime",
+  "description": "준비 시간을 계산해서 약속 시간을 지키게 해주는 앱",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0718",
+  "theme_color": "#7C3AED",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱️</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

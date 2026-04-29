@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="준비 시간을 계산해서 약속 시간을 지키게 해주는 앱">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>OnTime — 약속을 지키는 습관</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Splash -->
+<div id="splash">
+  <div class="splash-inner">
+    <h1 class="splash-title">OnTime</h1>
+    <p class="splash-sub">약속을 지키는 습관</p>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app" class="hidden">
+
+  <!-- HOME -->
+  <div id="view-home" class="view active">
+    <div class="view-scroll">
+      <header class="home-header">
+        <div>
+          <p class="greeting" id="greeting"></p>
+          <h2 class="today-date" id="today-date"></h2>
+        </div>
+      </header>
+
+      <div id="active-banner" class="active-banner hidden">
+        <div class="ab-top">
+          <span class="ab-badge">진행 중</span>
+          <span class="ab-name" id="ab-name"></span>
+        </div>
+        <div class="ab-middle">
+          <span class="ab-status" id="ab-status"></span>
+          <span class="ab-countdown" id="ab-countdown"></span>
+        </div>
+        <button class="ab-cta" id="btn-goto-timer">타이머 보기 →</button>
+      </div>
+
+      <section id="sec-feedback" class="hidden">
+        <h3 class="sec-title">피드백 필요</h3>
+        <div id="list-feedback"></div>
+      </section>
+
+      <section id="sec-upcoming">
+        <h3 class="sec-title">다가오는 약속</h3>
+        <div id="list-upcoming"></div>
+        <div id="empty-state" class="empty-state hidden">
+          <h3>약속이 없어요</h3>
+          <p>약속을 추가하면<br>준비 시간을 자동으로 계산해드려요</p>
+          <button class="btn btn-primary" id="btn-empty-add">약속 추가하기</button>
+        </div>
+      </section>
+
+      <section id="sec-past" class="hidden">
+        <h3 class="sec-title">지난 약속</h3>
+        <div id="list-past"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ADD -->
+  <div id="view-add" class="view">
+    <div class="view-scroll">
+      <header class="add-header">
+        <button class="back-btn" id="btn-add-back" aria-label="뒤로">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <h2 class="add-title" id="add-step-title">약속 정보</h2>
+        <div class="step-dots" id="step-dots">
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+      </header>
+
+      <!-- Step 1 -->
+      <div id="step-1" class="step active">
+        <p class="step-desc">어떤 약속인가요?</p>
+        <div class="form-group">
+          <label class="form-label">약속 이름</label>
+          <input id="in-name" type="text" class="form-input" placeholder="예: 홍대 친구 약속" maxlength="30">
+        </div>
+        <div class="form-group">
+          <label class="form-label">날짜</label>
+          <input id="in-date" type="date" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">약속 시간</label>
+          <input id="in-time" type="time" class="form-input">
+        </div>
+        <div class="step-footer">
+          <button class="btn btn-primary btn-full" id="btn-step1-next">다음</button>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div id="step-2" class="step">
+        <p class="step-desc">어디서 만나나요?</p>
+        <div class="form-group">
+          <label class="form-label">장소</label>
+          <input id="in-location" type="text" class="form-input" placeholder="예: 강남역 2번 출구">
+        </div>
+        <div class="form-group">
+          <label class="form-label">이동 수단</label>
+          <div class="mode-group" id="mode-group">
+            <button class="mode-btn active" data-mode="transit">대중교통</button>
+            <button class="mode-btn" data-mode="car">자동차</button>
+            <button class="mode-btn" data-mode="walk">도보</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">이동 시간 <span class="label-val" id="travel-val">30분</span></label>
+          <input id="in-travel" type="range" class="range-input" min="5" max="120" value="30" step="5">
+          <div class="range-labels"><span>5분</span><span>1시간</span><span>2시간</span></div>
+        </div>
+        <div class="step-footer">
+          <button class="btn btn-primary btn-full" id="btn-step2-next">다음</button>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div id="step-3" class="step">
+        <p class="step-desc">어떻게 준비할 건가요?</p>
+        <div class="ai-rec" id="ai-rec">
+          <span class="ai-badge">AI 추천</span>
+          <p class="ai-rec-text" id="ai-rec-text"></p>
+        </div>
+        <div class="prep-grid" id="prep-grid">
+          <button class="prep-card" data-style="quick">
+            <strong>빠르게</strong>
+            <span class="prep-desc">세수 + 옷 갈아입기</span>
+            <span class="prep-min">15분</span>
+          </button>
+          <button class="prep-card" data-style="normal">
+            <strong>보통</strong>
+            <span class="prep-desc">샤워 + 기본 스타일링</span>
+            <span class="prep-min">35분</span>
+          </button>
+          <button class="prep-card" data-style="fancy">
+            <strong>꾸미기</strong>
+            <span class="prep-desc">샤워 + 풀메이크업</span>
+            <span class="prep-min">60분</span>
+          </button>
+          <button class="prep-card" data-style="special">
+            <strong>특별한 날</strong>
+            <span class="prep-desc">헤어 + 향수까지</span>
+            <span class="prep-min">90분</span>
+          </button>
+        </div>
+        <div class="step-footer">
+          <button class="btn btn-primary btn-full" id="btn-step3-next">다음</button>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div id="step-4" class="step">
+        <p class="step-desc">이렇게 준비할게요</p>
+        <div class="summary-card" id="summary-card"></div>
+        <div class="timeline-card" id="timeline-card"></div>
+        <div class="step-footer">
+          <button class="btn btn-primary btn-full" id="btn-confirm">약속 추가하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMER -->
+  <div id="view-timer" class="view">
+    <div id="timer-bg" class="timer-bg"></div>
+    <div class="view-scroll timer-scroll">
+      <header class="timer-header">
+        <button class="back-btn" id="btn-timer-back" aria-label="뒤로">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <span class="timer-appt-name" id="timer-appt-name"></span>
+        <div style="width:34px"></div>
+      </header>
+
+      <div class="timer-main">
+        <div class="timer-ring-wrap">
+          <svg class="timer-ring" viewBox="0 0 220 220">
+            <circle class="ring-bg" cx="110" cy="110" r="95"/>
+            <circle class="ring-progress" id="ring-progress" cx="110" cy="110" r="95"
+              stroke-dasharray="597" stroke-dashoffset="597"/>
+          </svg>
+          <div class="timer-ring-inner">
+            <p class="timer-stage" id="timer-stage"></p>
+            <h1 class="timer-digits" id="timer-digits">00:00</h1>
+            <p class="timer-sublabel" id="timer-sublabel"></p>
+          </div>
+        </div>
+
+        <div class="timer-milestones" id="timer-milestones"></div>
+
+        <div class="timer-info-row">
+          <div class="timer-info-box">
+            <span class="tib-label">준비 시작</span>
+            <span class="tib-val" id="tib-prep"></span>
+          </div>
+          <div class="timer-info-box">
+            <span class="tib-label">출발</span>
+            <span class="tib-val" id="tib-depart"></span>
+          </div>
+          <div class="timer-info-box">
+            <span class="tib-label">약속</span>
+            <span class="tib-val" id="tib-appt"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div id="view-insights" class="view">
+    <div class="view-scroll">
+      <header class="home-header">
+        <div>
+          <p class="greeting">나의 약속 패턴</p>
+          <h2 class="today-date">인사이트</h2>
+        </div>
+      </header>
+      <div id="insights-content"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="nav-btn active" data-view="home" aria-label="홈">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9L12 2l9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span>홈</span>
+    </button>
+    <button class="nav-btn nav-add-btn" id="nav-add-btn" aria-label="약속 추가">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
+    <button class="nav-btn" data-view="insights" aria-label="인사이트">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/>
+        <line x1="12" y1="20" x2="12" y2="4"/>
+        <line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      <span>인사이트</span>
+    </button>
+  </nav>
+
+  <!-- FEEDBACK MODAL -->
+  <div id="modal-feedback" class="modal-overlay hidden">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title">약속 결과</h3>
+      <p class="modal-sub" id="fb-appt-name"></p>
+      <div class="fb-options">
+        <button class="fb-btn" data-result="early">일찍 도착</button>
+        <button class="fb-btn" data-result="ontime">정시 도착</button>
+        <button class="fb-btn" data-result="late">지각했어요</button>
+        <button class="fb-btn" data-result="cancelled">취소됐어요</button>
+      </div>
+      <div class="fb-minutes hidden" id="fb-minutes-wrap">
+        <label class="form-label" id="fb-minutes-label"></label>
+        <input type="number" id="fb-minutes-input" class="form-input" placeholder="분" min="1" max="120">
+      </div>
+      <button class="btn btn-primary btn-full" id="btn-fb-submit">저장하기</button>
+      <button class="btn btn-ghost btn-full" id="btn-fb-skip" style="margin-top:8px">나중에</button>
+    </div>
+  </div>
+
+  <!-- DETAIL MODAL -->
+  <div id="modal-detail" class="modal-overlay hidden">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div id="detail-content"></div>
+      <div class="detail-actions" id="detail-actions"></div>
+      <button class="btn btn-ghost btn-full" id="btn-detail-close">닫기</button>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast" class="toast hidden"></div>
+<script src="app.js"></script>
+</body>
+</html>
