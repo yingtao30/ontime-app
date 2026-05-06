@@ -2,7 +2,7 @@
 
 // ── Constants ──────────────────────────────
 const PREP_TIMES = { quick:15, normal:35, fancy:60, special:90 };
-const PREP_LABELS = { quick:'🏃 빠르게', normal:'😊 보통', fancy:'✨꾸미기', special:'🎩 특별한 날' };
+const PREP_LABELS = { quick:'빠르게', normal:'보통', fancy:'꾸미기', special:'특별한 날' };
 const BUFFER = 5; // minutes
 
 // ── State ──────────────────────────────────
@@ -88,11 +88,7 @@ function showView(name) {
 // ── Home View ───────────────────────────────
 function renderHome() {
   const now = new Date();
-  // greeting
-  const h = now.getHours();
-  const greet = h<12?'좋은 아침이에요 ☀️':h<17?'안녕하세요 👋':h<21?'좋은 저녁이에요 🌆':'좋은 밤이에요 🌙';
-  document.getElementById('greeting').textContent = greet;
-  document.getElementById('today-date').textContent = fmtDate(now);
+document.getElementById('today-date').textContent = fmtDate(now);
 
   // categorise
   const upcoming = appointments.filter(a=>!a.feedback && new Date(a.appointmentTime)>now);
@@ -166,7 +162,7 @@ function updateBanner(a) {
   } else if (now < departTime) {
     status='준비 중 🏃'; ms=departTime-now;
   } else if (now < apptTime) {
-    status='이동 중 🚇'; ms=apptTime-now;
+    status='이동 중'; ms=apptTime-now;
   } else {
     status='약속 시간 지남'; ms=0;
   }
@@ -217,7 +213,7 @@ function openDetail(id) {
     <p class="modal-sub">${fmtDate(apptTime)} · ${fmt(apptTime)}</p>
     <div class="summary-card">
       <div class="summary-row"><span class="sr-label">장소</span><span class="sr-val">${a.location}</span></div>
-      <div class="summary-row"><span class="sr-label">이동 수단</span><span class="sr-val">${a.travelMode==='transit'?'🚇 대중교통':a.travelMode==='car'?'🚗 자동차':'🚶 도보'}</span></div>
+      <div class="summary-row"><span class="sr-label">이동 수단</span><span class="sr-val">${a.travelMode==='transit'?'대중교통':a.travelMode==='car'?'자동차':'도보'}</span></div>
       <div class="summary-row"><span class="sr-label">이동 시간</span><span class="sr-val">${a.travelTime}분</span></div>
       <div class="summary-row"><span class="sr-label">준비 스타일</span><span class="sr-val">${PREP_LABELS[a.prepStyle]}</span></div>
       <div class="summary-row"><span class="sr-label">준비 시작</span><span class="sr-val">${fmt(a.prepStartTime)}</span></div>
@@ -324,7 +320,7 @@ function validateStep1() {
   if (isNaN(dt.getTime())) { showToast('올바른 날짜/시간 형식을 확인해주세요'); return false; }
   // Allow up to 30 minutes in the past (user might take time filling the form)
   if (dt < new Date(Date.now() - 30 * 60 * 1000)) {
-    showToast('너무 과거의 시간이에요. 다시 확인해주세요 ⏰'); return false;
+    showToast('너무 과거의 시간이에요. 다시 확인해주세요'); return false;
   }
   draft.name = name;
   draft.appointmentTime = dt.toISOString();
@@ -389,9 +385,9 @@ function renderSummary() {
     <div class="summary-row"><span class="sr-label">총 이동 시간</span><span class="sr-val">${draft.travelTime}분</span></div>`;
 
   document.getElementById('timeline-card').innerHTML = `
-    <div class="timeline-title">📍 타임라인</div>
+    <div class="timeline-title">타임라인</div>
     <div class="tl-item"><div class="tl-dot tl-prep">🏃</div><div class="tl-info"><div class="tl-label">준비 시작</div><div class="tl-time">${fmt(prepStart)}</div></div></div>
-    <div class="tl-item"><div class="tl-dot tl-depart">🚇</div><div class="tl-info"><div class="tl-label">출발</div><div class="tl-time">${fmt(departTime)}</div></div></div>
+    <div class="tl-item"><div class="tl-dot tl-depart"></div><div class="tl-info"><div class="tl-label">출발</div><div class="tl-time">${fmt(departTime)}</div></div></div>
     <div class="tl-item"><div class="tl-dot tl-appt">✅</div><div class="tl-info"><div class="tl-label">약속</div><div class="tl-time">${fmt(apptTime)}</div></div></div>`;
 }
 
@@ -431,14 +427,14 @@ function tickTimer(a) {
   const totalPrepMs=dep-prep, totalTransMs=appt-dep;
   let stage,ms,totalMs,ringClass,bgClass,sublabel;
   if (now<prep) {
-    stage='⏰ 준비 전';ms=prep-now;totalMs=prep-now;ringClass='ring-purple';bgClass='prep';sublabel='준비 시작까지';
+    stage='준비 전';ms=prep-now;totalMs=prep-now;ringClass='ring-purple';bgClass='prep';sublabel='준비 시작까지';
   } else if (now<dep) {
     const p=pct(dep-now,totalPrepMs);
     stage='🏃 준비 중';ms=dep-now;totalMs=totalPrepMs;
     ringClass=p>0.3?'ring-purple':p>0.1?'ring-yellow':'ring-red';
     bgClass=p>0.3?'prep':p>0.1?'warning':'danger';sublabel='출발까지';
   } else if (now<appt) {
-    stage='🚇 이동 중';ms=appt-now;totalMs=totalTransMs;ringClass='ring-blue';bgClass='transit';sublabel='약속까지';
+    stage='이동 중';ms=appt-now;totalMs=totalTransMs;ringClass='ring-blue';bgClass='transit';sublabel='약속까지';
   } else {
     stage='✅ 도착!';ms=0;totalMs=1;ringClass='ring-green';bgClass='';sublabel='수고했어요';
     clearInterval(timerInterval);
@@ -494,7 +490,7 @@ function renderInsights() {
           <span class="progress-label">${v}회</span>
         </div>`).join('')}
     </div>
-    ${withFb.length===0?`<div class="empty-state"><div class="empty-icon">📊</div><h3>아직 데이터가 없어요</h3><p>약속 후 피드백을 남기면 인사이트가 쌓여요</p></div>`:''}`;
+    ${withFb.length===0?`<div class="empty-state"><h3>아직 데이터가 없어요</h3><p>약속 후 피드백을 남기면 인사이트가 쌓여요</p></div>`:''}`;
 }
 
 // ── Feedback Modal ───────────────────────────
