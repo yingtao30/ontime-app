@@ -73,7 +73,7 @@ body{width:390px;min-height:100vh;height:100%;overflow:hidden;position:relative;
 .ab-cta:hover{background:rgba(255,255,255,.28);}
 
 /* ── Section Titles ───────────────────────── */
-.sec-title{font-size:18px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.12em;margin:16px 0 10px;}
+.sec-title{font-size:14px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.12em;margin:16px 0 10px;}
 
 /* ── Appointment Cards ────────────────────── */
 .appt-card{background:var(--surface);border-radius:var(--r-lg);padding:16px;margin-bottom:8px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);}
